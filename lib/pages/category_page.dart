@@ -20,7 +20,10 @@ class CategoryPage extends StatelessWidget {
               context: context,
               title: 'Category',
               positiveButtonText: 'ADD',
-              onSubmit: (value) {});
+              onSubmit: (value) {
+                Provider.of<ProductProvider>(context, listen: false)
+                    .addNewCategory(value);
+              });
         },
         child: const Icon(Icons.add),
       ),

@@ -15,6 +15,15 @@ class DbHelper {
     return snapshot.exists;
   }
 
+  static Future<void> addCategory(CategoryModel categoryModel) {
+    final doc = _db.collection(collectionCategory).doc();
+    categoryModel.categoryId = doc.id;
+    return doc.set(categoryModel.toMap());
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllCategories() =>
+      _db.collection(collectionCategory).snapshots();
+
   /*static Future<bool> doesUserExist(String uid) async {
     final snapshot = await _db.collection(collectionUser).doc(uid).get();
     return snapshot.exists;
