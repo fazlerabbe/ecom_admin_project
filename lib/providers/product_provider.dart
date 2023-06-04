@@ -17,6 +17,11 @@ class ProductProvider extends ChangeNotifier {
     return DbHelper.addCategory(categoryModel);
   }
 
+  Future<void> addNewProduct(
+      ProductModel productModel, PurchaseModel purchaseModel) {
+    return DbHelper.addNewProduct(productModel, purchaseModel);
+  }
+
   getAllCategories() {
     DbHelper.getAllCategories().listen((snapshot) {
       categoryList = List.generate(snapshot.docs.length,
@@ -25,6 +30,23 @@ class ProductProvider extends ChangeNotifier {
           .sort((cat1, cat2) => cat1.categoryName.compareTo(cat2.categoryName));
       notifyListeners();
     });
+  }
+
+  getAllProducts() {
+    DbHelper.getAllProducts().listen((snapshot) {
+      productList = List.generate(snapshot.docs.length,
+          (index) => ProductModel.fromMap(snapshot.docs[index].data()));
+      notifyListeners();
+    });
+  }
+
+  Future<String> uploadImage(String thumbnailImageLocalPath) async {
+    final photoRef = FirebaseStorage.instance
+        .ref()
+        .child('ProductImages/${DateTime.now().millisecondsSinceEpoch}');
+    final uploadTask = photoRef.putFile(File(thumbnailImageLocalPath));
+    final snapshot = await uploadTask.whenComplete(() => null);
+    return snapshot.ref.getDownloadURL();
   }
 
   /*Future<void> addNewCategory(String category) {

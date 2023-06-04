@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:ecom_admin_project/models/product_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -9,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../models/category_model.dart';
+import '../models/date_model.dart';
 import '../models/purchase_model.dart';
 import '../providers/product_provider.dart';
 import '../utils/helper_functions.dart';
@@ -133,22 +135,28 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
             ),
           ),
-          DropdownButtonFormField<CategoryModel>(
-            hint: const Text('Select Category'),
-            value: categoryModel,
-            isExpanded: true,
-            validator: (value) {
-              if (value == null) {
-                return 'Please select a category';
-              }
-              return null;
-            },
-            items: [],
-            onChanged: (value) {
-              setState(() {
-                categoryModel = value;
-              });
-            },
+          Consumer<ProductProvider>(
+            builder: (context, provider, child) =>
+                DropdownButtonFormField<CategoryModel>(
+              hint: const Text('Select Category'),
+              value: categoryModel,
+              isExpanded: true,
+              validator: (value) {
+                if (value == null) {
+                  return 'Please select a category';
+                }
+                return null;
+              },
+              items: provider.categoryList
+                  .map((catModel) => DropdownMenuItem<CategoryModel>(
+                      value: catModel, child: Text(catModel.categoryName)))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  categoryModel = value;
+                });
+              },
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -292,16 +300,23 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: _saveProduct,
-            child: const Text('SAVE'),
-          )
         ],
       ),
     );
   }
 
-  void _selectDate() async {}
+  void _selectDate() async {
+    final selectedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(DateTime.now().year - 2),
+        lastDate: DateTime.now());
+    if (selectedDate != null) {
+      setState(() {
+        purchaseDate = selectedDate;
+      });
+    }
+  }
 
   void _getImage(ImageSource imageSource) async {
     final pickedImage = await ImagePicker().pickImage(
@@ -329,7 +344,43 @@ class _AddProductPageState extends State<AddProductPage> {
     if (_formKey.currentState!.validate()) {
       String? downloadUrl;
       EasyLoading.show(status: 'Please wait', dismissOnTap: false);
-      try {} catch (error) {
+      try {
+        downloadUrl =
+            await _productProvider.uploadImage(thumbnailImageLocalPath!);
+        final productModel = ProductModel(
+          productName: _nameController.text,
+          shortDescription: _shortDescriptionController.text,
+          longDescription: _longDescriptionController.text,
+          stock: num.parse(_quantityController.text),
+          salePrice: num.parse(_salePriceController.text),
+          category: categoryModel!,
+          thumbnailImageUrl: downloadUrl,
+          productDiscount: num.parse(_discountController.text),
+          additionalImages: [
+            '',
+            '',
+            '',
+          ],
+        );
+        final purchaseModel = PurchaseModel(
+          dateModel: DateModel(
+            timestamp: Timestamp.now(),
+            day: DateTime.now().day,
+            month: DateTime.now().month,
+            year: DateTime.now().year,
+          ),
+          purchasePrice: num.parse(
+            _purchasePriceController.text,
+          ),
+          purchaseQuantity: num.parse(
+            _quantityController.text,
+          ),
+        );
+        await _productProvider.addNewProduct(productModel, purchaseModel);
+        _resetFields();
+        EasyLoading.dismiss();
+        showMsg(context, 'Added');
+      } catch (error) {
         showMsg(context, 'Something went wrong ${error.toString()}');
         EasyLoading.dismiss();
         print(error.toString());

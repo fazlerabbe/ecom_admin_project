@@ -36,7 +36,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb ? null : AppBar(
+      appBar: AppBar(
         title: Text(productModel.productName),
       ),
       body: ListView(
@@ -128,16 +128,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           ),
           SwitchListTile(
             value: productModel.available,
-            onChanged: (value) {
-
-            },
+            onChanged: (value) {},
             title: const Text('Available'),
           ),
           SwitchListTile(
             value: productModel.featured,
-            onChanged: (value) {
-
-            },
+            onChanged: (value) {},
             title: const Text('Featured'),
           ),
           OutlinedButton(
@@ -181,9 +177,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
     if (selectedFile != null) {
       EasyLoading.show(status: 'Please wait');
-      try {
-
-      } catch (error) {
+      try {} catch (error) {
         EasyLoading.dismiss();
         if (mounted) showMsg(context, 'Upload failed');
         rethrow;
@@ -216,7 +210,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     Navigator.pop(context);
                     EasyLoading.show(status: 'Deleting...');
                     try {
-
                       EasyLoading.dismiss();
                     } catch (error) {
                       EasyLoading.dismiss();

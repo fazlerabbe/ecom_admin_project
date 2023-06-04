@@ -37,6 +37,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     Provider.of<ProductProvider>(context, listen: false).getAllCategories();
+    Provider.of<ProductProvider>(context, listen: false).getAllProducts();
     /*Provider.of<ProductProvider>(context, listen: false).getAllCategories();
     Provider.of<ProductProvider>(context, listen: false).getAllProducts();
     Provider.of<ProductProvider>(context, listen: false).getAllPurchase();
