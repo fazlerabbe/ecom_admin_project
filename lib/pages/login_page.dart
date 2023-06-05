@@ -1,9 +1,9 @@
-import 'package:ecom_admin_project/pages/launcher_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import '../auth/authservice.dart';
+import 'launcher_page.dart';
 
 class LoginPage extends StatefulWidget {
   static const String routeName = '/login';
@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           await AuthService.logout();
           setState(() {
-            _errMsg = 'you are not an admin.please login with a admin account';
+            _errMsg = 'You are not an Admin. Please login with a Admin account';
           });
         }
       } on FirebaseAuthException catch (error) {

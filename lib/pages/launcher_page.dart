@@ -1,7 +1,8 @@
-import 'package:ecom_admin_project/pages/dashboard_page.dart';
+
 import 'package:flutter/material.dart';
 
 import '../auth/authservice.dart';
+import 'dashboard_page.dart';
 import 'login_page.dart';
 
 class LauncherPage extends StatelessWidget {
@@ -12,7 +13,10 @@ class LauncherPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Future.delayed(Duration.zero, () {
       if (AuthService.currentUser != null) {
-        Navigator.pushReplacementNamed(context, DashboardPage.routeName);
+        Navigator.pushReplacementNamed(
+          context,
+          DashboardPage.routeName,
+        );
       } else {
         Navigator.pushReplacementNamed(context, LoginPage.routeName);
       }

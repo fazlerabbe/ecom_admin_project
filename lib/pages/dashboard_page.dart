@@ -1,28 +1,15 @@
-import 'dart:io';
-
-import '../models/dashboard_model.dart';
-import '../pages/add_product_page.dart';
-import '../pages/category_page.dart';
-import '../pages/dashboard_home.dart';
-import '../pages/notification_page.dart';
-import '../pages/order_page.dart';
-import '../pages/report_page.dart';
-import '../pages/settings_page.dart';
-import '../pages/view_product_page.dart';
-import '../providers/product_provider.dart';
-import '../utils/constants.dart';
+import 'package:ecom_admin_project/auth/authservice.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../auth/authservice.dart';
+
 import '../customwidgets/badge_view.dart';
 import '../customwidgets/dashboard_item_view.dart';
-import '../providers/notification_provider.dart';
+import '../models/dashboard_model.dart';
 import '../providers/order_provider.dart';
-import '../providers/user_provider.dart';
+import '../providers/product_provider.dart';
 import 'launcher_page.dart';
-import 'user_list_page.dart';
 
 class DashboardPage extends StatefulWidget {
   static const String routeName = '/dashboard';
@@ -38,10 +25,10 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     Provider.of<ProductProvider>(context, listen: false).getAllCategories();
     Provider.of<ProductProvider>(context, listen: false).getAllProducts();
-    /*Provider.of<ProductProvider>(context, listen: false).getAllCategories();
-    Provider.of<ProductProvider>(context, listen: false).getAllProducts();
-    Provider.of<ProductProvider>(context, listen: false).getAllPurchase();
     Provider.of<OrderProvider>(context, listen: false).getOrderConstants();
+    Provider.of<ProductProvider>(context, listen: false).getAllPurchase();
+
+    /*
     Provider.of<OrderProvider>(context, listen: false).getOrders();
     Provider.of<UserProvider>(context, listen: false).getAllUsers();
     Provider.of<NotificationProvider>(context, listen: false)

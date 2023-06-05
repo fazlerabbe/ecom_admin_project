@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:ecom_admin_project/models/product_model.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -11,6 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../models/category_model.dart';
 import '../models/date_model.dart';
+import '../models/product_model.dart';
 import '../models/purchase_model.dart';
 import '../providers/product_provider.dart';
 import '../utils/helper_functions.dart';
@@ -112,7 +114,6 @@ class _AddProductPageState extends State<AddProductPage> {
                           ),
                   ),
                   Wrap(
-                    direction: getAxis(MediaQuery.of(context).size.width),
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       TextButton.icon(
@@ -149,7 +150,9 @@ class _AddProductPageState extends State<AddProductPage> {
               },
               items: provider.categoryList
                   .map((catModel) => DropdownMenuItem<CategoryModel>(
-                      value: catModel, child: Text(catModel.categoryName)))
+                        value: catModel,
+                        child: Text(catModel.categoryName),
+                      ))
                   .toList(),
               onChanged: (value) {
                 setState(() {
@@ -307,10 +310,11 @@ class _AddProductPageState extends State<AddProductPage> {
 
   void _selectDate() async {
     final selectedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(DateTime.now().year - 2),
-        lastDate: DateTime.now());
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(DateTime.now().year - 2),
+      lastDate: DateTime.now(),
+    );
     if (selectedDate != null) {
       setState(() {
         purchaseDate = selectedDate;

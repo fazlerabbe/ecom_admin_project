@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../models/date_model.dart';
 import '../models/product_model.dart';
 import '../models/purchase_model.dart';
+import '../providers/product_provider.dart';
 import '../utils/helper_functions.dart';
 
 class ProductRepurchasePage extends StatefulWidget {
@@ -27,9 +28,13 @@ class _ProductRepurchasePageState extends State<ProductRepurchasePage> {
     productModel = ModalRoute.of(context)!.settings.arguments as ProductModel;
     super.didChangeDependencies();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Re-purchase'),
+      ),
       body: Center(
         child: Form(
           key: _formKey,
@@ -37,8 +42,14 @@ class _ProductRepurchasePageState extends State<ProductRepurchasePage> {
             shrinkWrap: true,
             padding: const EdgeInsets.all(24),
             children: [
-              Text(productModel.productName, style: Theme.of(context).textTheme.headline5,),
-              const Divider(height: 2, color: Colors.grey,),
+              Text(
+                productModel.productName,
+                style: Theme.of(context).textTheme.headline5,
+              ),
+              const Divider(
+                height: 2,
+                color: Colors.grey,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                 child: TextFormField(
@@ -107,6 +118,7 @@ class _ProductRepurchasePageState extends State<ProductRepurchasePage> {
       ),
     );
   }
+
   void _selectDate() async {
     final date = await showDatePicker(
       context: context,
@@ -114,7 +126,7 @@ class _ProductRepurchasePageState extends State<ProductRepurchasePage> {
       firstDate: DateTime(DateTime.now().year - 1),
       lastDate: DateTime.now(),
     );
-    if(date != null) {
+    if (date != null) {
       setState(() {
         purchaseDate = date;
       });
@@ -122,14 +134,34 @@ class _ProductRepurchasePageState extends State<ProductRepurchasePage> {
   }
 
   void _repurchase() {
-    if(purchaseDate == null) {
+    if (purchaseDate == null) {
       showMsg(context, 'Please select a purchase date');
       return;
     }
 
-    if(_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
       EasyLoading.show(status: 'Please wait');
-
+      final model = PurchaseModel(
+        productId: productModel.productId,
+        purchasePrice: num.parse(_purchasePriceController.text),
+        purchaseQuantity: num.parse(_quantityController.text),
+        dateModel: DateModel(
+          timestamp: Timestamp.fromDate(purchaseDate!),
+          day: purchaseDate!.day,
+          month: purchaseDate!.month,
+          year: purchaseDate!.year,
+        ),
+      );
+      Provider.of<ProductProvider>(context, listen: false)
+          .repurchase(model, productModel)
+          .then((value) {
+        EasyLoading.dismiss();
+        showMsg(context, 'Repurchased successfully');
+        Navigator.pop(context);
+      }).catchError((error) {
+        EasyLoading.dismiss();
+        showMsg(context, 'Repurchase failed!!!');
+      });
     }
   }
 }

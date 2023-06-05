@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -28,15 +29,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   void didChangeDependencies() {
-    productProvider = Provider.of<ProductProvider>(context, listen: false);
-    productModel = ModalRoute.of(context)!.settings.arguments as ProductModel;
+    productProvider = Provider.of<ProductProvider>(context);
+    final id = ModalRoute.of(context)!.settings.arguments as String;
+    productModel = productProvider.getProductById(id);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: kIsWeb ? null : AppBar(
         title: Text(productModel.productName),
       ),
       body: ListView(
@@ -124,16 +126,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           ),
           ListTile(
             title: Text('Sale Price: $currencySymbol${productModel.salePrice}'),
-            subtitle: Text('Stock: ${productModel.stock}'),
+            subtitle: Text('Stock: ${productModel.stock}', style: const TextStyle(fontSize: 20),),
           ),
           SwitchListTile(
             value: productModel.available,
-            onChanged: (value) {},
+            onChanged: (value) {
+              /*setState(() {
+                productModel.available = !productModel.available;
+              });*/
+              productProvider.updateProductField(productModel.productId!, productFieldAvailable, value);
+            },
             title: const Text('Available'),
           ),
           SwitchListTile(
             value: productModel.featured,
-            onChanged: (value) {},
+            onChanged: (value) {
+              productProvider.updateProductField(productModel.productId!, productFieldFeatured, value);
+            },
             title: const Text('Featured'),
           ),
           OutlinedButton(
@@ -146,10 +155,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   void _showPurchaseList() {
+
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          final purchaseList = [];
+          final purchaseList = productProvider.getPurchaseByProductId(productModel.productId!);
           return Container(
             margin: const EdgeInsets.all(20),
             child: ListView.builder(
@@ -177,7 +187,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
     if (selectedFile != null) {
       EasyLoading.show(status: 'Please wait');
-      try {} catch (error) {
+      try {
+
+      } catch (error) {
         EasyLoading.dismiss();
         if (mounted) showMsg(context, 'Upload failed');
         rethrow;
@@ -210,6 +222,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     Navigator.pop(context);
                     EasyLoading.show(status: 'Deleting...');
                     try {
+
                       EasyLoading.dismiss();
                     } catch (error) {
                       EasyLoading.dismiss();
